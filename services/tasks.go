@@ -5,10 +5,10 @@ import (
 	"todo/models"
 )
 
-func AddTask(listId int64, desc string) error {
+func AddTask(listId int64, desc string) (models.Task, error) {
 	taskList, err := getTaskList(listId)
 	if err != nil {
-		return err
+		return models.Task{}, err
 	}
 
 	newTask := models.Task{
@@ -16,7 +16,7 @@ func AddTask(listId int64, desc string) error {
 		Desc: desc,
 	}
 	taskList.Tasks = append(taskList.Tasks, newTask)
-	return nil
+	return newTask, nil
 }
 
 func DeleteTask(listId int64, taskId int64) error {
