@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"todo/models"
@@ -50,19 +49,39 @@ func CreateTaskList(rw http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteTaskList(rw http.ResponseWriter, r *http.Request) {
+	resBody := struct {
+		Status string `json:"status"`
+		Error  string `json:"error"`
+		ListId int64  `json:"listId"`
+	}{
+		Status: "",
+		Error:  "",
+		ListId: 0,
+	}
+
 	vars := mux.Vars(r)
 	listId, err := strconv.Atoi(vars["listId"])
 	if err != nil {
-		fmt.Fprint(rw, err)
+		rw.WriteHeader(500)
+		resBody.Status = "failed"
+		resBody.Error = err.Error()
+		json.NewEncoder(rw).Encode(resBody)
 		return
 	}
-	err = services.DeleteTaskList(int64(listId))
+
+	_, err = services.DeleteTaskList(int64(listId))
 	if err != nil {
-		fmt.Fprint(rw, err)
+		rw.WriteHeader(406)
+		resBody.Status = "failed"
+		resBody.Error = err.Error()
+		json.NewEncoder(rw).Encode(resBody)
 		return
 	}
-	fmt.Fprint(rw, "successfully deleted task-list")
-	// models.ShowTodos()
+
+	rw.WriteHeader(200)
+	resBody.Status = "successfully deleted task-list"
+	resBody.ListId = int64(listId)
+	json.NewEncoder(rw).Encode(resBody)
 }
 
 func GetTodos(rw http.ResponseWriter, r *http.Request) {
