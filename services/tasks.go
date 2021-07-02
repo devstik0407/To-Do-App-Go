@@ -19,21 +19,23 @@ func AddTask(listId int64, desc string) (models.Task, error) {
 	return newTask, nil
 }
 
-func DeleteTask(listId int64, taskId int64) error {
+func DeleteTask(listId int64, taskId int64) (models.Task, error) {
 	_, err := getTask(listId, taskId)
 	if err != nil {
-		return err
+		return models.Task{}, err
 	}
 
 	taskList, _ := getTaskList(listId)
 	index := 0
+	task := models.Task{}
 	for i := range taskList.Tasks {
 		if taskList.Tasks[i].Id == taskId {
 			index = i
+			task = taskList.Tasks[i]
 		}
 	}
 	taskList.Tasks = append(taskList.Tasks[:index], taskList.Tasks[index+1:]...)
-	return nil
+	return task, nil
 }
 
 func UpdateTask(listId, taskId int64, newDesc string) (models.Task, error) {
