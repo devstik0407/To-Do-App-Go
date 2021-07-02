@@ -36,13 +36,13 @@ func DeleteTask(listId int64, taskId int64) error {
 	return nil
 }
 
-func UpdateTask(listId, taskId int64, newDesc string) error {
+func UpdateTask(listId, taskId int64, newDesc string) (models.Task, error) {
 	task, err := getTask(listId, taskId)
 	if err != nil {
-		return err
+		return models.Task{}, err
 	}
 	task.Desc = newDesc
-	return nil
+	return *task, nil
 }
 
 func getTask(listId, taskId int64) (*models.Task, error) {
