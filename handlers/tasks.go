@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"todo/models"
+	"todo/services"
 
 	"github.com/gorilla/mux"
 )
@@ -23,7 +24,7 @@ func AddTask(rw http.ResponseWriter, r *http.Request) {
 	var t models.Task
 	json.Unmarshal(reqBody, &t)
 
-	err = models.AddTask(int64(listId), t.Desc)
+	err = services.AddTask(int64(listId), t.Desc)
 	if err != nil {
 		fmt.Fprint(rw, err)
 		return
@@ -50,7 +51,7 @@ func UpdateTask(rw http.ResponseWriter, r *http.Request) {
 	var t models.Task
 	json.Unmarshal(reqBody, &t)
 
-	err = models.UpdateTask(int64(listId), int64(taskId), t.Desc)
+	err = services.UpdateTask(int64(listId), int64(taskId), t.Desc)
 	if err != nil {
 		fmt.Fprint(rw, err)
 		return
@@ -73,7 +74,7 @@ func DeleteTask(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = models.DeleteTask(int64(listId), int64(taskId))
+	err = services.DeleteTask(int64(listId), int64(taskId))
 	if err != nil {
 		fmt.Fprint(rw, err)
 		return
