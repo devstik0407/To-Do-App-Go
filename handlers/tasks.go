@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"todo/models"
@@ -115,24 +114,45 @@ func UpdateTask(rw http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteTask(rw http.ResponseWriter, r *http.Request) {
+	resBody := struct {
+		Status string      `json:"status"`
+		Error  string      `json:"error"`
+		Task   models.Task `json:"task"`
+	}{
+		Status: "",
+		Error:  "",
+		Task:   models.Task{},
+	}
+
 	vars := mux.Vars(r)
 	listId, err := strconv.Atoi(vars["listId"])
 	if err != nil {
-		fmt.Fprint(rw, err)
+		rw.WriteHeader(500)
+		resBody.Error = err.Error()
+		resBody.Status = "failed"
+		json.NewEncoder(rw).Encode(resBody)
 		return
 	}
 
 	taskId, err := strconv.Atoi(vars["taskId"])
 	if err != nil {
-		fmt.Fprint(rw, err)
+		rw.WriteHeader(500)
+		resBody.Error = err.Error()
+		resBody.Status = "failed"
+		json.NewEncoder(rw).Encode(resBody)
 		return
 	}
 
-	err = services.DeleteTask(int64(listId), int64(taskId))
+	task, err := services.DeleteTask(int64(listId), int64(taskId))
 	if err != nil {
-		fmt.Fprint(rw, err)
+		rw.WriteHeader(406)
+		resBody.Error = err.Error()
+		resBody.Status = "failed"
+		json.NewEncoder(rw).Encode(resBody)
 		return
 	}
-	fmt.Fprint(rw, "successfully deleted task from list")
-	// models.ShowTodos()
+
+	resBody.Status = "successfully deleted task"
+	resBody.Task = task
+	json.NewEncoder(rw).Encode(resBody)
 }
