@@ -17,10 +17,10 @@ func CreateTaskList(title string) (int64, error) {
 	return taskList.Id, nil
 }
 
-func DeleteTaskList(listId int64) error {
+func DeleteTaskList(listId int64) (int64, error) {
 	_, err := getTaskList(listId)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	index := 0
@@ -30,7 +30,7 @@ func DeleteTaskList(listId int64) error {
 		}
 	}
 	Todos = append(Todos[:index], Todos[index+1:]...)
-	return nil
+	return listId, nil
 }
 
 func getTaskList(listId int64) (*models.TaskList, error) {
