@@ -7,14 +7,14 @@ import (
 
 var Todos []models.TaskList
 
-func CreateTaskList(title string) error {
+func CreateTaskList(title string) (int64, error) {
 	taskList := models.TaskList{
 		Id:    newTaskListId(),
 		Title: title,
 		Tasks: []models.Task{},
 	}
 	Todos = append(Todos, taskList)
-	return nil
+	return taskList.Id, nil
 }
 
 func DeleteTaskList(listId int64) error {
