@@ -9,7 +9,7 @@ var Todos []models.TaskList
 
 func CreateTaskList(title string) (int64, error) {
 	taskList := models.TaskList{
-		Id:    newTaskListId(),
+		Id:    NewTaskListId(),
 		Title: title,
 		Tasks: []models.Task{},
 	}
@@ -42,7 +42,7 @@ func getTaskList(listId int64) (*models.TaskList, error) {
 	return nil, errors.New("invalid task-list id")
 }
 
-func newTaskListId() int64 {
+func NewTaskListId() int64 {
 	if len(Todos) == 0 {
 		return 1
 	}
