@@ -82,3 +82,44 @@ func TestUpdateTask(t *testing.T) {
 		t.Errorf("actual: %v expected: %v", rrU.Body, expectedBody)
 	}
 }
+
+func TestDeleteTask(t *testing.T) {
+	req, err := http.NewRequest("POST", "/todos", bytes.NewBuffer([]byte(`{"title":"Thursday"}`)))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	listId := services.NewTaskListId()
+	r := mux.NewRouter()
+	r.HandleFunc("/todos", CreateTaskList)
+	rrC := httptest.NewRecorder()
+	r.ServeHTTP(rrC, req)
+
+	req, err = http.NewRequest("POST", fmt.Sprintf("/todos/%d", listId), bytes.NewBuffer([]byte(`{"desc":"drink water"}`)))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r.HandleFunc("/todos/{listId}", AddTask)
+	rrA := httptest.NewRecorder()
+	r.ServeHTTP(rrA, req)
+
+	taskId := int64(1)
+	req, err = http.NewRequest("DELETE", fmt.Sprintf("/todos/%d/%d", listId, taskId), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r.HandleFunc("/todos/{listId}/{taskId}", DeleteTask)
+	rrD := httptest.NewRecorder()
+	r.ServeHTTP(rrD, req)
+
+	if rrD.Code != 200 {
+		t.Errorf("actual: %v expected: %v", rrD.Code, 201)
+	}
+
+	expectedBody := `{"status":"successfully deleted task","error":"","task":{"id":1,"desc":"drink water"}}` + "\n"
+	if rrD.Body.String() != expectedBody {
+		t.Errorf("actual: %v expected: %v", rrD.Body, expectedBody)
+	}
+}
