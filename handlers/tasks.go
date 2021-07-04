@@ -52,6 +52,7 @@ func AddTask(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	rw.WriteHeader(201)
 	resBody.Status = "successfully added task"
 	resBody.Task = task
 	json.NewEncoder(rw).Encode(resBody)
