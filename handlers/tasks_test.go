@@ -79,6 +79,6 @@ func TestUpdateTask(t *testing.T) {
 
 	expectedBody := `{"status":"successfully updated task","error":"","task":{"id":1,"desc":"sleep"}}` + "\n"
 	if rrU.Body.String() != expectedBody {
-		t.Errorf("actual: %v expected: %v", rrA.Body, expectedBody)
+		t.Errorf("actual: %v expected: %v", rrU.Body, expectedBody)
 	}
 }
