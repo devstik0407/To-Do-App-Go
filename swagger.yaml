@@ -1,0 +1,290 @@
+swagger: '2.0'
+consumes:
+  - application/json
+produces:
+  - application/json
+schemes:
+  - http
+  - https
+info:
+  description: "this is a REST API for managing TODOs"
+  title: 'ToDo API'
+  termsOfService: 'there are no TOS at this moment, use at your own risk we take no responsibility'
+  contact:
+    name: 'Swastik Dutta'
+    url: 'https://github.com/devstik0407'
+    email: "swastik713@gmail.com"
+  license:
+    name: ""
+  version: "1.0"
+host: localhost
+basePath: /todos
+x-meta-value: value
+x-meta-array:
+  - value1
+  - value2
+x-meta-array-obj:
+  - name: obj
+    value: field
+paths:
+  /todos:
+    get:
+      operationId: "getTodos"
+      deprecated: false
+      summary: "Lists all Todos."
+      description: "This will show all available Todos by default"
+      tags: []
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      schemes:
+      - http
+      - https
+      responses:
+        "200":
+          description: "successfully obtained data"
+          schema:
+            $ref: "#/definitions/todosList"
+    post:
+      operationId: "createTaskList"
+      deprecated: false
+      summary: "Creates a TaskList given the title."
+      description: "Creates a TaskList given the title."
+      tags: []
+      consumes:
+      - application/json
+      schemes:
+      - http
+      - https
+      parameters:
+      - name: "title"
+        in: "body"
+        description: "title of the task-list to create"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        "201":
+          description: "successful creation"
+          schema:
+            $ref: "#/definitions/taskListResponse"
+        "400":
+          description: "Invalid request body"
+          schema:
+            $ref: "#/definitions/taskListResponse"
+        "500":
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/taskListResponse"
+  /todos/{listId}:
+    post:
+      operationId: "AddTask"
+      deprecated: false
+      summary: "Adds a Task into a task-list."
+      description: "Adds a Task into a task-list."
+      tags: []
+      consumes:
+      - application/json
+      schemes:
+      - http
+      - https
+      parameters:
+      - name: "desc"
+        in: "body"
+        description: "description the task to add"
+        required: true
+        schema:
+          type: "string"
+      - name: "listId"
+        in: "path"
+        description: "id of the task-list to add the task into"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "201":
+          description: "successfully added task"
+          schema:
+            $ref: "#/definitions/taskResponse"
+        "400":
+          description: "Invalid request body"
+          schema:
+            $ref: "#/definitions/taskResponse"
+        "406":
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/taskResponse"
+        "500":
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/taskResponse"
+    delete:
+      operationId: "DeleteTaskList"
+      deprecated: false
+      summary: "Deletes a task-list."
+      description: "Deletes a task-list."
+      tags: []
+      consumes:
+      - application/json
+      schemes:
+      - http
+      - https
+      parameters:
+      - name: "listId"
+        in: "path"
+        description: "id of the task-list to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successfully deleted task-list"
+          schema:
+            $ref: "#/definitions/taskListResponse"
+        "406":
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/taskListResponse"
+        "500":
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/taskListResponse"
+  /todos/{listId}/{taskId}:
+    put:
+      operationId: "UpdateTask"
+      deprecated: false
+      summary: "Updates a task."
+      description: "Updates a task."
+      tags: []
+      consumes:
+      - application/json
+      schemes:
+      - http
+      - https
+      parameters:
+      - name: "listId"
+        in: "path"
+        description: "id of the task-list containing the task to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "taskId"
+        in: "path"
+        description: "id of the task to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "201":
+          description: "successfully updated task"
+          schema:
+            $ref: "#/definitions/taskResponse"
+        "400":
+          description: "Invalid request body"
+          schema:
+            $ref: "#/definitions/taskResponse"
+        "406":
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/taskResponse"
+        "500":
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/taskResponse"
+    delete:
+      operationId: "DeleteTask"
+      deprecated: false
+      summary: "Deletes a task."
+      description: "Deletes a task."
+      tags: []
+      consumes:
+      - application/json
+      schemes:
+      - http
+      - https
+      parameters:
+      - name: "listId"
+        in: "path"
+        description: "id of the task-list containing the task to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "taskId"
+        in: "path"
+        description: "id of the task to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successfully deleted task"
+          schema:
+            $ref: "#/definitions/taskResponse"
+        "406":
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/taskResponse"
+        "500":
+          description: "Internal server error"
+          schema:
+            $ref: "#/definitions/taskResponse"
+definitions:
+  Task:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        format: "int64"
+      Desc:
+        type: "string"
+        format: "string"
+    xml: {}
+  TaskList:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        format: "int64"
+      Title:
+        type: "string"
+        format: "string"
+      Tasks:
+        type: "array"
+        items:
+          $ref: "#/definitions/Task" 
+    xml: {}
+  taskResponse:
+    type: "object"
+    properties:
+      Status:
+        type: "string"
+        format: "string"
+      Error:
+        type: "string"
+        format: "int64"
+      Task:
+        $ref: "#/definitions/Task"
+    xml:
+      name: "TaskResponse"
+  taskListResponse:
+    type: "object"
+    properties:
+      Status:
+        type: "string"
+        format: "string"
+      Error:
+        type: "string"
+        format: "string"
+      ListId:
+        type: "integer"
+        format: "int64"
+    xml:
+      name: "TaskListResponse"
+  todosList:
+    type: "array"
+    items:
+      $ref: "#/definitions/TaskList"
+    xml:
+      name: "todosList"
+  
