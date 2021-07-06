@@ -5,8 +5,8 @@ A REST API for managing TODOs.
 This a REST API for listing and maintaining your tasks. You can create a task-list, add, update and delete tasks from that list, delete a task-list and read all the task-lists.
 
 # Requirements
-- Go (version 1.16.5)
-- gorilla/mux package (github.com/gorilla/mux)
+- Go (version `1.16.5`)
+- gorilla/mux package (`github.com/gorilla/mux`)
 
 # How to use?
 - Change working directory to the root directory of the application
@@ -14,9 +14,55 @@ This a REST API for listing and maintaining your tasks. You can create a task-li
 ```
 go run main.go
 ```
+## Create a task-list 
+- Send a POST request to `/todos`
+- Request body should contain the title of the task-list to create
+```JSON
+{
+    "title": "Monday"
+}
+```
+- Response body
+```JSON
+{
+    "status": "successfully created task-list",
+    "error": "",
+    "listId": 1
+}
+```
+## Add a task into a task-list
+- Send a POST request to `/todos/{listId}` (`listId` is id of the task-list)
+- Request body should contain the description of the task to add
+```JSON
+{
+    "desc": "Read books"
+}
+```
+- Response body
+```JSON
+{
+    "status": "successfully added task",
+    "error": "",
+    "task": {
+        "id": 1,
+        "desc": "Read books"
+    }
+}
+```
+## Delete a task-list
+- Send a DELETE request to `/todos/{listId}` (`listId` is id of the task-list)
+- Response body
+```JSON
+{
+    "status": "successfully deleted task-list",
+    "error": "",
+    "listId": 1
+}
+```
+For more details, please check the `swagger.yaml` file
 
 # Testing Guide
-- cd into the handlers folder and run
+- cd into the `handlers` directory and run
 ```
 go test
 ```
