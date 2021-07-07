@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"todo/models"
-	"todo/services"
+	"todo/todos"
 
 	"github.com/gorilla/mux"
 )
@@ -43,7 +43,7 @@ func AddTask(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := services.AddTask(int64(listId), t.Desc)
+	task, err := todos.AddTask(int64(listId), t.Desc)
 	if err != nil {
 		rw.WriteHeader(406)
 		resBody.Error = err.Error()
@@ -100,7 +100,7 @@ func UpdateTask(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := services.UpdateTask(int64(listId), int64(taskId), t.Desc)
+	task, err := todos.UpdateTask(int64(listId), int64(taskId), t.Desc)
 	if err != nil {
 		rw.WriteHeader(406)
 		resBody.Error = err.Error()
@@ -145,7 +145,7 @@ func DeleteTask(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := services.DeleteTask(int64(listId), int64(taskId))
+	task, err := todos.DeleteTask(int64(listId), int64(taskId))
 	if err != nil {
 		rw.WriteHeader(406)
 		resBody.Error = err.Error()

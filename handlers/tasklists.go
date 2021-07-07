@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"todo/models"
-	"todo/services"
+	"todo/todos"
 
 	"github.com/gorilla/mux"
 )
@@ -33,7 +33,7 @@ func CreateTaskList(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newListId, err := services.CreateTaskList(p.Title)
+	newListId, err := todos.CreateTaskList(p.Title)
 	if err != nil {
 		rw.WriteHeader(500)
 		resBody.Status = "failed"
@@ -69,7 +69,7 @@ func DeleteTaskList(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = services.DeleteTaskList(int64(listId))
+	_, err = todos.DeleteTaskList(int64(listId))
 	if err != nil {
 		rw.WriteHeader(406)
 		resBody.Status = "failed"
@@ -85,5 +85,5 @@ func DeleteTaskList(rw http.ResponseWriter, r *http.Request) {
 }
 
 func GetTodos(rw http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(rw).Encode(services.Todos)
+	json.NewEncoder(rw).Encode(todos.Todos)
 }

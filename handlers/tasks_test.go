@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"todo/services"
+	"todo/todos"
 
 	"github.com/gorilla/mux"
 )
@@ -17,7 +17,7 @@ func TestAddTask(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	listId := services.NewTaskListId()
+	listId := todos.NewTaskListId()
 	r := mux.NewRouter()
 	r.HandleFunc("/todos", CreateTaskList)
 	rrC := httptest.NewRecorder()
@@ -48,7 +48,7 @@ func TestUpdateTask(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	listId := services.NewTaskListId()
+	listId := todos.NewTaskListId()
 	r := mux.NewRouter()
 	r.HandleFunc("/todos", CreateTaskList)
 	rrC := httptest.NewRecorder()
@@ -89,7 +89,7 @@ func TestDeleteTask(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	listId := services.NewTaskListId()
+	listId := todos.NewTaskListId()
 	r := mux.NewRouter()
 	r.HandleFunc("/todos", CreateTaskList)
 	rrC := httptest.NewRecorder()
