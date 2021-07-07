@@ -2,16 +2,25 @@ package todos
 
 import (
 	"errors"
-	"todo/models"
+	"fmt"
 )
 
-func AddTask(listId int64, desc string) (models.Task, error) {
+type Task struct {
+	Id   int64  `json:"id"`
+	Desc string `json:"desc"`
+}
+
+func (t Task) show() {
+	fmt.Printf("id: %d, description: %s", t.Id, t.Desc)
+}
+
+func AddTask(listId int64, desc string) (Task, error) {
 	taskList, err := getTaskList(listId)
 	if err != nil {
-		return models.Task{}, err
+		return Task{}, err
 	}
 
-	newTask := models.Task{
+	newTask := Task{
 		Id:   newTaskId(taskList),
 		Desc: desc,
 	}
@@ -19,15 +28,15 @@ func AddTask(listId int64, desc string) (models.Task, error) {
 	return newTask, nil
 }
 
-func DeleteTask(listId int64, taskId int64) (models.Task, error) {
+func DeleteTask(listId int64, taskId int64) (Task, error) {
 	_, err := getTask(listId, taskId)
 	if err != nil {
-		return models.Task{}, err
+		return Task{}, err
 	}
 
 	taskList, _ := getTaskList(listId)
 	index := 0
-	task := models.Task{}
+	task := Task{}
 	for i := range taskList.Tasks {
 		if taskList.Tasks[i].Id == taskId {
 			index = i
@@ -38,16 +47,16 @@ func DeleteTask(listId int64, taskId int64) (models.Task, error) {
 	return task, nil
 }
 
-func UpdateTask(listId, taskId int64, newDesc string) (models.Task, error) {
+func UpdateTask(listId, taskId int64, newDesc string) (Task, error) {
 	task, err := getTask(listId, taskId)
 	if err != nil {
-		return models.Task{}, err
+		return Task{}, err
 	}
 	task.Desc = newDesc
 	return *task, nil
 }
 
-func getTask(listId, taskId int64) (*models.Task, error) {
+func getTask(listId, taskId int64) (*Task, error) {
 	taskList, err := getTaskList(listId)
 	if err != nil {
 		return nil, err
@@ -60,7 +69,7 @@ func getTask(listId, taskId int64) (*models.Task, error) {
 	return nil, errors.New("invalid task id")
 }
 
-func newTaskId(taskList *models.TaskList) int64 {
+func newTaskId(taskList *TaskList) int64 {
 	if len(taskList.Tasks) == 0 {
 		return 1
 	}

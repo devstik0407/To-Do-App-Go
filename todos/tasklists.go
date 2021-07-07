@@ -2,16 +2,26 @@ package todos
 
 import (
 	"errors"
-	"todo/models"
+	"fmt"
 )
 
-var Todos []models.TaskList
+var Todos []TaskList
+
+type TaskList struct {
+	Id    int64  `json:"id"`
+	Title string `json:"title"`
+	Tasks []Task `json:"tasks"`
+}
+
+func (tl TaskList) show() {
+	fmt.Printf("id: %d, title: %s, tasks: %v\n", tl.Id, tl.Title, tl.Tasks)
+}
 
 func CreateTaskList(title string) (int64, error) {
-	taskList := models.TaskList{
+	taskList := TaskList{
 		Id:    NewTaskListId(),
 		Title: title,
-		Tasks: []models.Task{},
+		Tasks: []Task{},
 	}
 	Todos = append(Todos, taskList)
 	return taskList.Id, nil
@@ -33,7 +43,7 @@ func DeleteTaskList(listId int64) (int64, error) {
 	return listId, nil
 }
 
-func getTaskList(listId int64) (*models.TaskList, error) {
+func getTaskList(listId int64) (*TaskList, error) {
 	for i, taskList := range Todos {
 		if taskList.Id == listId {
 			return &Todos[i], nil

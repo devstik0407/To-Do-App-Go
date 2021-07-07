@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"todo/models"
 	"todo/todos"
 
 	"github.com/gorilla/mux"
@@ -21,7 +20,7 @@ func CreateTaskList(rw http.ResponseWriter, r *http.Request) {
 		ListId: 0,
 	}
 
-	p := models.TaskList{}
+	p := todos.TaskList{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	err := d.Decode(&p)

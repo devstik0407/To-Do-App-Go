@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"todo/models"
 	"todo/todos"
 
 	"github.com/gorilla/mux"
@@ -12,13 +11,13 @@ import (
 
 func AddTask(rw http.ResponseWriter, r *http.Request) {
 	resBody := struct {
-		Status string      `json:"status"`
-		Error  string      `json:"error"`
-		Task   models.Task `json:"task"`
+		Status string     `json:"status"`
+		Error  string     `json:"error"`
+		Task   todos.Task `json:"task"`
 	}{
 		Status: "",
 		Error:  "",
-		Task:   models.Task{},
+		Task:   todos.Task{},
 	}
 
 	vars := mux.Vars(r)
@@ -31,7 +30,7 @@ func AddTask(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t := models.Task{}
+	t := todos.Task{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	err = d.Decode(&t)
@@ -60,13 +59,13 @@ func AddTask(rw http.ResponseWriter, r *http.Request) {
 
 func UpdateTask(rw http.ResponseWriter, r *http.Request) {
 	resBody := struct {
-		Status string      `json:"status"`
-		Error  string      `json:"error"`
-		Task   models.Task `json:"task"`
+		Status string     `json:"status"`
+		Error  string     `json:"error"`
+		Task   todos.Task `json:"task"`
 	}{
 		Status: "",
 		Error:  "",
-		Task:   models.Task{},
+		Task:   todos.Task{},
 	}
 
 	vars := mux.Vars(r)
@@ -88,7 +87,7 @@ func UpdateTask(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t := models.Task{}
+	t := todos.Task{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	err = d.Decode(&t)
@@ -117,13 +116,13 @@ func UpdateTask(rw http.ResponseWriter, r *http.Request) {
 
 func DeleteTask(rw http.ResponseWriter, r *http.Request) {
 	resBody := struct {
-		Status string      `json:"status"`
-		Error  string      `json:"error"`
-		Task   models.Task `json:"task"`
+		Status string     `json:"status"`
+		Error  string     `json:"error"`
+		Task   todos.Task `json:"task"`
 	}{
 		Status: "",
 		Error:  "",
-		Task:   models.Task{},
+		Task:   todos.Task{},
 	}
 
 	vars := mux.Vars(r)
