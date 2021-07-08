@@ -158,3 +158,66 @@ func TestGetTaskListFail(t *testing.T) {
 		t.Errorf("actual error: %v \nexpected error: %v", err, errors.New("invalid listId"))
 	}
 }
+
+func TestGetTodosSuccess(t *testing.T) {
+	mockService := Service{
+		DataStore: mockStore{
+			CreateTaskListFunc: func(newTaskList TaskList) error {
+				return nil
+			},
+			MaxListIdFunc: func() (int64, error) {
+				return 0, nil
+			},
+			GetTodosFunc: func() ([]TaskList, error) {
+				return []TaskList{
+					{Id: 1, Title: "Monday", Tasks: []Task{}},
+					{Id: 2, Title: "Tuesday", Tasks: []Task{}},
+				}, nil
+			},
+		},
+	}
+
+	_, err := mockService.CreateTaskList("Monday")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = mockService.CreateTaskList("Tuesday")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	actualTodos, err := mockService.GetTodos()
+	if err != nil {
+		t.Error(err)
+	}
+
+	expectedTodos := []TaskList{
+		{Id: 1, Title: "Monday", Tasks: []Task{}},
+		{Id: 2, Title: "Tuesday", Tasks: []Task{}},
+	}
+	for i := 0; i < 2; i++ {
+		if (actualTodos[i].Id != expectedTodos[i].Id) ||
+			(actualTodos[i].Title != expectedTodos[i].Title) ||
+			(len(actualTodos[i].Tasks) != 0) {
+			t.Errorf("actual: %v\nexpected: %v", actualTodos, expectedTodos)
+		}
+	}
+}
+
+func TestGetTodosFail(t *testing.T) {
+	mockService := Service{
+		DataStore: mockStore{
+			GetTodosFunc: func() ([]TaskList, error) {
+				return []TaskList{}, errors.New("no todos found")
+			},
+		},
+	}
+
+	_, err := mockService.GetTodos()
+	if err == nil {
+		t.Errorf("actual: none\nexpected: %v", errors.New("no todos found"))
+	}
+	if err.Error() != "no todos found" {
+		t.Errorf("actual: %v\nexpected: %v", err, errors.New("no todos found"))
+	}
+}
