@@ -31,7 +31,10 @@ func (s Service) AddTask(listId int64, desc string) (Task, error) {
 		Id:   newId,
 		Desc: desc,
 	}
-	s.DataStore.AddTask(listId, newTask)
+	err = s.DataStore.AddTask(listId, newTask)
+	if err != nil {
+		return Task{}, err
+	}
 	return newTask, nil
 }
 
