@@ -1,78 +1,73 @@
 package todos
 
-import (
-	"errors"
-	"fmt"
-)
-
 type Task struct {
 	Id   int64  `json:"id"`
 	Desc string `json:"desc"`
 }
 
-func (t Task) show() {
-	fmt.Printf("id: %d, description: %s", t.Id, t.Desc)
+type Service struct {
+	DataStore Store
 }
 
-func AddTask(listId int64, desc string) (Task, error) {
-	taskList, err := getTaskList(listId)
+type Store interface {
+	AddTask(listId int64, newTask Task) error
+	GetTask(listId, taskId int64) (Task, error)
+	UpdateTask(listId int64, newTask Task) error
+	DeleteTask(listId, taskId int64) (Task, error)
+	CreateTaskList(newTaskList TaskList) error
+	GetTaskList(listId int64) (TaskList, error)
+	DeleteTaskList(listId int64) error
+	MaxTaskIdInList(listId int64) (int64, error)
+	MaxListId() (int64, error)
+}
+
+func (s Service) AddTask(listId int64, desc string) (Task, error) {
+	newId, err := s.NewTaskId(listId)
 	if err != nil {
 		return Task{}, err
 	}
 
 	newTask := Task{
-		Id:   newTaskId(taskList),
+		Id:   newId,
 		Desc: desc,
 	}
-	taskList.Tasks = append(taskList.Tasks, newTask)
+	s.DataStore.AddTask(listId, newTask)
 	return newTask, nil
 }
 
-func DeleteTask(listId int64, taskId int64) (Task, error) {
-	_, err := getTask(listId, taskId)
+func (s Service) DeleteTask(listId int64, taskId int64) (Task, error) {
+	task, err := s.DataStore.DeleteTask(listId, taskId)
 	if err != nil {
 		return Task{}, err
 	}
-
-	taskList, _ := getTaskList(listId)
-	index := 0
-	task := Task{}
-	for i := range taskList.Tasks {
-		if taskList.Tasks[i].Id == taskId {
-			index = i
-			task = taskList.Tasks[i]
-		}
-	}
-	taskList.Tasks = append(taskList.Tasks[:index], taskList.Tasks[index+1:]...)
 	return task, nil
 }
 
-func UpdateTask(listId, taskId int64, newDesc string) (Task, error) {
-	task, err := getTask(listId, taskId)
+func (s Service) UpdateTask(listId, taskId int64, newDesc string) (Task, error) {
+	newTask := Task{
+		Id:   taskId,
+		Desc: newDesc,
+	}
+
+	err := s.DataStore.UpdateTask(listId, newTask)
 	if err != nil {
 		return Task{}, err
 	}
-	task.Desc = newDesc
-	return *task, nil
+	return newTask, nil
 }
 
-func getTask(listId, taskId int64) (*Task, error) {
-	taskList, err := getTaskList(listId)
+func (s Service) GetTask(listId, taskId int64) (Task, error) {
+	task, err := s.DataStore.GetTask(listId, taskId)
 	if err != nil {
-		return nil, err
+		return Task{}, err
 	}
-	for i, task := range taskList.Tasks {
-		if task.Id == taskId {
-			return &taskList.Tasks[i], nil
-		}
-	}
-	return nil, errors.New("invalid task id")
+	return task, nil
 }
 
-func newTaskId(taskList *TaskList) int64 {
-	if len(taskList.Tasks) == 0 {
-		return 1
+func (s Service) NewTaskId(listId int64) (int64, error) {
+	maxId, err := s.DataStore.MaxTaskIdInList(listId)
+	if err != nil {
+		return 0, err
 	}
-	lastTask := taskList.Tasks[len(taskList.Tasks)-1]
-	return lastTask.Id + 1
+	return maxId + 1, nil
 }

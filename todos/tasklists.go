@@ -1,10 +1,5 @@
 package todos
 
-import (
-	"errors"
-	"fmt"
-)
-
 var Todos []TaskList
 
 type TaskList struct {
@@ -13,49 +8,45 @@ type TaskList struct {
 	Tasks []Task `json:"tasks"`
 }
 
-func (tl TaskList) show() {
-	fmt.Printf("id: %d, title: %s, tasks: %v\n", tl.Id, tl.Title, tl.Tasks)
-}
-
-func CreateTaskList(title string) (int64, error) {
-	taskList := TaskList{
-		Id:    NewTaskListId(),
-		Title: title,
-		Tasks: []Task{},
-	}
-	Todos = append(Todos, taskList)
-	return taskList.Id, nil
-}
-
-func DeleteTaskList(listId int64) (int64, error) {
-	_, err := getTaskList(listId)
+func (s Service) CreateTaskList(title string) (int64, error) {
+	newListId, err := s.NewTaskListId()
 	if err != nil {
 		return 0, err
 	}
 
-	index := 0
-	for i := range Todos {
-		if Todos[i].Id == listId {
-			index = i
-		}
+	taskList := TaskList{
+		Id:    newListId,
+		Title: title,
+		Tasks: []Task{},
 	}
-	Todos = append(Todos[:index], Todos[index+1:]...)
+
+	err = s.DataStore.CreateTaskList(taskList)
+	if err != nil {
+		return 0, err
+	}
+	return taskList.Id, nil
+}
+
+func (s Service) DeleteTaskList(listId int64) (int64, error) {
+	err := s.DataStore.DeleteTaskList(listId)
+	if err != nil {
+		return 0, err
+	}
 	return listId, nil
 }
 
-func getTaskList(listId int64) (*TaskList, error) {
-	for i, taskList := range Todos {
-		if taskList.Id == listId {
-			return &Todos[i], nil
-		}
+func (s Service) GetTaskList(listId int64) (TaskList, error) {
+	taskList, err := s.DataStore.GetTaskList(listId)
+	if err != nil {
+		return TaskList{}, err
 	}
-	return nil, errors.New("invalid task-list id")
+	return taskList, nil
 }
 
-func NewTaskListId() int64 {
-	if len(Todos) == 0 {
-		return 1
+func (s Service) NewTaskListId() (int64, error) {
+	maxId, err := s.DataStore.MaxListId()
+	if err != nil {
+		return 0, err
 	}
-	lastTaskList := Todos[len(Todos)-1]
-	return lastTaskList.Id + 1
+	return maxId + 1, nil
 }
