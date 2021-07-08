@@ -9,12 +9,31 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func AddTask(rw http.ResponseWriter, r *http.Request) {
-	resBody := struct {
-		Status string     `json:"status"`
-		Error  string     `json:"error"`
-		Task   todos.Task `json:"task"`
-	}{
+type Handler struct {
+	Service TodoService
+}
+
+type TodoService interface {
+	AddTask(listId int64, desc string) (todos.Task, error)
+	GetTask(listId, taskId int64) (todos.Task, error)
+	UpdateTask(listId, taskId int64, newDesc string) (todos.Task, error)
+	DeleteTask(listId, taskId int64) (todos.Task, error)
+	CreateTaskList(title string) (int64, error)
+	GetTaskList(listId int64) (todos.TaskList, error)
+	DeleteTaskList(listId int64) (int64, error)
+	GetTodos() ([]todos.TaskList, error)
+	NewTaskListId() (int64, error)
+	NewTaskId(listId int64) (int64, error)
+}
+
+type TaskResponse struct {
+	Status string     `json:"status"`
+	Error  string     `json:"error"`
+	Task   todos.Task `json:"task"`
+}
+
+func (h Handler) AddTask(rw http.ResponseWriter, r *http.Request) {
+	resBody := TaskResponse{
 		Status: "",
 		Error:  "",
 		Task:   todos.Task{},
@@ -42,7 +61,7 @@ func AddTask(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := todos.AddTask(int64(listId), t.Desc)
+	task, err := h.Service.AddTask(int64(listId), t.Desc)
 	if err != nil {
 		rw.WriteHeader(406)
 		resBody.Error = err.Error()
@@ -57,12 +76,8 @@ func AddTask(rw http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(rw).Encode(resBody)
 }
 
-func UpdateTask(rw http.ResponseWriter, r *http.Request) {
-	resBody := struct {
-		Status string     `json:"status"`
-		Error  string     `json:"error"`
-		Task   todos.Task `json:"task"`
-	}{
+func (h Handler) UpdateTask(rw http.ResponseWriter, r *http.Request) {
+	resBody := TaskResponse{
 		Status: "",
 		Error:  "",
 		Task:   todos.Task{},
@@ -99,7 +114,7 @@ func UpdateTask(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := todos.UpdateTask(int64(listId), int64(taskId), t.Desc)
+	task, err := h.Service.UpdateTask(int64(listId), int64(taskId), t.Desc)
 	if err != nil {
 		rw.WriteHeader(406)
 		resBody.Error = err.Error()
@@ -114,12 +129,8 @@ func UpdateTask(rw http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(rw).Encode(resBody)
 }
 
-func DeleteTask(rw http.ResponseWriter, r *http.Request) {
-	resBody := struct {
-		Status string     `json:"status"`
-		Error  string     `json:"error"`
-		Task   todos.Task `json:"task"`
-	}{
+func (h Handler) DeleteTask(rw http.ResponseWriter, r *http.Request) {
+	resBody := TaskResponse{
 		Status: "",
 		Error:  "",
 		Task:   todos.Task{},
@@ -144,7 +155,7 @@ func DeleteTask(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := todos.DeleteTask(int64(listId), int64(taskId))
+	task, err := h.Service.DeleteTask(int64(listId), int64(taskId))
 	if err != nil {
 		rw.WriteHeader(406)
 		resBody.Error = err.Error()

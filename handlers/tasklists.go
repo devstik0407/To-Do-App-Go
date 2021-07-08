@@ -9,12 +9,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func CreateTaskList(rw http.ResponseWriter, r *http.Request) {
-	resBody := struct {
-		Status string `json:"status"`
-		Error  string `json:"error"`
-		ListId int64  `json:"listId"`
-	}{
+type TaskListResponse struct {
+	Status string `json:"status"`
+	Error  string `json:"error"`
+	ListId int64  `json:"listId"`
+}
+
+func (h Handler) CreateTaskList(rw http.ResponseWriter, r *http.Request) {
+	resBody := TaskListResponse{
 		Status: "",
 		Error:  "",
 		ListId: 0,
@@ -32,7 +34,7 @@ func CreateTaskList(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newListId, err := todos.CreateTaskList(p.Title)
+	newListId, err := h.Service.CreateTaskList(p.Title)
 	if err != nil {
 		rw.WriteHeader(500)
 		resBody.Status = "failed"
@@ -47,12 +49,8 @@ func CreateTaskList(rw http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(rw).Encode(resBody)
 }
 
-func DeleteTaskList(rw http.ResponseWriter, r *http.Request) {
-	resBody := struct {
-		Status string `json:"status"`
-		Error  string `json:"error"`
-		ListId int64  `json:"listId"`
-	}{
+func (h Handler) DeleteTaskList(rw http.ResponseWriter, r *http.Request) {
+	resBody := TaskListResponse{
 		Status: "",
 		Error:  "",
 		ListId: 0,
@@ -68,7 +66,7 @@ func DeleteTaskList(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = todos.DeleteTaskList(int64(listId))
+	_, err = h.Service.DeleteTaskList(int64(listId))
 	if err != nil {
 		rw.WriteHeader(406)
 		resBody.Status = "failed"
@@ -83,6 +81,24 @@ func DeleteTaskList(rw http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(rw).Encode(resBody)
 }
 
-func GetTodos(rw http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(rw).Encode(todos.Todos)
+func (h Handler) GetTodos(rw http.ResponseWriter, r *http.Request) {
+	resBody := struct {
+		Status string           `json:"status"`
+		Error  string           `json:"error"`
+		Todos  []todos.TaskList `json:"todos"`
+	}{}
+	defer func() {
+		json.NewEncoder(rw).Encode(resBody)
+	}()
+
+	todos, err := h.Service.GetTodos()
+	if err != nil {
+		rw.WriteHeader(503)
+		resBody.Error = err.Error()
+		resBody.Status = "failed"
+		return
+	}
+
+	resBody.Status = "successfully fetched all todos"
+	resBody.Todos = todos
 }
