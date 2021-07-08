@@ -1,11 +1,17 @@
 package todos
 
-var Todos []TaskList
-
 type TaskList struct {
 	Id    int64  `json:"id"`
 	Title string `json:"title"`
 	Tasks []Task `json:"tasks"`
+}
+
+func (s Service) GetTodos() ([]TaskList, error) {
+	todos, err := s.DataStore.GetTodos()
+	if err != nil {
+		return []TaskList{}, err
+	}
+	return todos, nil
 }
 
 func (s Service) CreateTaskList(title string) (int64, error) {

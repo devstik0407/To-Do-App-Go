@@ -17,6 +17,7 @@ type Store interface {
 	CreateTaskList(newTaskList TaskList) error
 	GetTaskList(listId int64) (TaskList, error)
 	DeleteTaskList(listId int64) error
+	GetTodos() ([]TaskList, error)
 	MaxTaskIdInList(listId int64) (int64, error)
 	MaxListId() (int64, error)
 }

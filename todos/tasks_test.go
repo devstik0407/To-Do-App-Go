@@ -175,6 +175,7 @@ type mockStore struct {
 	CreateTaskListFunc  func(newTaskList TaskList) error
 	GetTaskListFunc     func(listId int64) (TaskList, error)
 	DeleteTaskListFunc  func(listId int64) error
+	GetTodosFunc        func() ([]TaskList, error)
 	MaxTaskIdInListFunc func(listId int64) (int64, error)
 	MaxListIdFunc       func() (int64, error)
 }
@@ -205,6 +206,10 @@ func (ms mockStore) GetTaskList(listId int64) (TaskList, error) {
 
 func (ms mockStore) DeleteTaskList(listId int64) error {
 	return ms.DeleteTaskListFunc(listId)
+}
+
+func (ms mockStore) GetTodos() ([]TaskList, error) {
+	return ms.GetTodosFunc()
 }
 
 func (ms mockStore) MaxTaskIdInList(listId int64) (int64, error) {
