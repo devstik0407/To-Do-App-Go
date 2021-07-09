@@ -2,6 +2,7 @@ package mongostore
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 	"todo/todos"
@@ -46,4 +47,17 @@ func (md MongoDB) CreateTaskList(newTaskList todos.TaskList) error {
 		return err
 	}
 	return nil
+}
+
+func (md MongoDB) GetTaskList(listId int64) (todos.TaskList, error) {
+	collection := md.Client.Database("todosDB").Collection("todos")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var res todos.TaskList
+	err := collection.FindOne(ctx, bson.D{{"id", listId}}).Decode(&res)
+	if err != nil {
+		return todos.TaskList{}, errors.New("invalid listId")
+	}
+	return res, nil
 }
