@@ -109,3 +109,18 @@ func (md MongoDB) MaxTaskIdInList(listId int64) (int64, error) {
 	}
 	return maxTaskId, nil
 }
+
+func (md MongoDB) MaxListId() (int64, error) {
+	todos, err := md.GetTodos()
+	if err != nil {
+		return -1, err
+	}
+
+	maxListId := int64(0)
+	for i := 0; i < len(todos); i++ {
+		if maxListId < todos[i].Id {
+			maxListId = todos[i].Id
+		}
+	}
+	return maxListId, nil
+}
