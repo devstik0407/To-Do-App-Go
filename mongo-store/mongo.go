@@ -76,3 +76,21 @@ func (md MongoDB) DeleteTaskList(listId int64) error {
 	}
 	return nil
 }
+
+func (md MongoDB) GetTodos() ([]todos.TaskList, error) {
+	collection := md.Client.Database("todosDB").Collection("todos")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var res []todos.TaskList
+
+	cursor, err := collection.Find(ctx, bson.D{})
+	if err != nil {
+		return nil, err
+	}
+
+	if err = cursor.All(context.TODO(), &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}

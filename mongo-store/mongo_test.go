@@ -81,3 +81,44 @@ func TestDeleteTaskListFail(t *testing.T) {
 		t.Errorf("actual error: %v\nexpected error: %v", err, errors.New("invalid listId"))
 	}
 }
+
+func TestGetTodos(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	md := Connect(ctx)
+
+	err := md.CreateTaskList(todos.TaskList{Id: 1, Title: "Monday", Tasks: nil})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err = md.DeleteTaskList(1); err != nil {
+			t.Fatal(err)
+		}
+	}()
+	err = md.CreateTaskList(todos.TaskList{Id: 2, Title: "Tuesday", Tasks: nil})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err = md.DeleteTaskList(2); err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	actualTodos, err := md.GetTodos()
+	if err != nil {
+		t.Error(err)
+	}
+	expectedTodos := []todos.TaskList{
+		{Id: 1, Title: "Monday", Tasks: nil},
+		{Id: 2, Title: "Tuesday", Tasks: nil},
+	}
+
+	for i := 0; i < 1; i++ {
+		if actualTodos[i].Id != expectedTodos[i].Id || actualTodos[i].Title != expectedTodos[i].Title || len(actualTodos[i].Tasks) != len(expectedTodos[i].Tasks) {
+			t.Errorf("actual: %v\nexpected: %v", actualTodos, expectedTodos)
+		}
+	}
+}
