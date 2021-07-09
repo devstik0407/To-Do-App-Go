@@ -142,3 +142,17 @@ func (md MongoDB) AddTask(listId int64, newTask todos.Task) error {
 	}
 	return nil
 }
+
+func (md MongoDB) GetTask(listId, taskId int64) (todos.Task, error) {
+	taskList, err := md.GetTaskList(listId)
+	if err != nil {
+		return todos.Task{}, err
+	}
+
+	for i := 0; i < len(taskList.Tasks); i++ {
+		if taskList.Tasks[i].Id == taskId {
+			return taskList.Tasks[i], nil
+		}
+	}
+	return todos.Task{}, errors.New("invalid taskId")
+}

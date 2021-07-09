@@ -153,3 +153,36 @@ func TestAddTaskFail(t *testing.T) {
 		t.Errorf("actual error: %v\nexpected error: %v", err, errors.New("invalid listId"))
 	}
 }
+
+func TestGetTaskSuccess(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	md := Connect(ctx)
+	actualTask, err := md.GetTask(1, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedTask := todos.Task{
+		Id:   1,
+		Desc: "watch movies",
+	}
+	if actualTask != expectedTask {
+		t.Errorf("actual: %v\nexpected: %v", actualTask, expectedTask)
+	}
+}
+
+func TestGetTaskFail(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	md := Connect(ctx)
+	_, err := md.GetTask(1, 2)
+	if err == nil {
+		t.Errorf("actual error: none\nexpected error: %v", errors.New("invalid taskId"))
+	}
+	if err.Error() != "invalid taskId" {
+		t.Errorf("actual error: %v\nexpected error: %v", err, errors.New("invalid taskId"))
+	}
+}
