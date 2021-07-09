@@ -122,3 +122,34 @@ func TestGetTodos(t *testing.T) {
 		}
 	}
 }
+
+func TestAddTaskSuccess(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	md := Connect(ctx)
+	err := md.CreateTaskList(todos.TaskList{Id: 1, Title: "Monday", Tasks: []todos.Task{}})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = md.AddTask(1, todos.Task{Id: 1, Desc: "watch movies"})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestAddTaskFail(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	md := Connect(ctx)
+
+	err := md.AddTask(2, todos.Task{Id: 1, Desc: "watch movies"})
+	if err == nil {
+		t.Errorf("actual error: none\nexpected error: %v", errors.New("invalid listId"))
+	}
+	if err.Error() != "invalid listId" {
+		t.Errorf("actual error: %v\nexpected error: %v", err, errors.New("invalid listId"))
+	}
+}

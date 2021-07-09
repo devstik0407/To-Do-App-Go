@@ -124,3 +124,21 @@ func (md MongoDB) MaxListId() (int64, error) {
 	}
 	return maxListId, nil
 }
+
+func (md MongoDB) AddTask(listId int64, newTask todos.Task) error {
+	taskList, err := md.GetTaskList(listId)
+	if err != nil {
+		return err
+	}
+
+	taskList.Tasks = append(taskList.Tasks, newTask)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	collection := md.Client.Database("todosDB").Collection("todos")
+	err = collection.FindOneAndUpdate(ctx, bson.D{{"id", listId}}, bson.D{{"$set", bson.D{{"tasks", taskList.Tasks}}}}).Err()
+	if err != nil {
+		return err
+	}
+	return nil
+}
