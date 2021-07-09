@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"todo/todos"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -29,4 +31,19 @@ func Connect(ctx context.Context) MongoDB {
 	}()
 
 	return MongoDB{Client: client}
+}
+
+func (md MongoDB) CreateTaskList(newTaskList todos.TaskList) error {
+	collection := md.Client.Database("todosDB").Collection("todos")
+	bsonTaskList, err := bson.Marshal(newTaskList)
+	if err != nil {
+		return err
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_, err = collection.InsertOne(ctx, bsonTaskList)
+	if err != nil {
+		return err
+	}
+	return nil
 }
