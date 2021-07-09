@@ -156,3 +156,31 @@ func (md MongoDB) GetTask(listId, taskId int64) (todos.Task, error) {
 	}
 	return todos.Task{}, errors.New("invalid taskId")
 }
+
+func (md MongoDB) UpdateTask(listId int64, newTask todos.Task) error {
+	taskList, err := md.GetTaskList(listId)
+	if err != nil {
+		return err
+	}
+
+	taskFound := false
+	for i := 0; i < len(taskList.Tasks); i++ {
+		if taskList.Tasks[i].Id == newTask.Id {
+			taskFound = true
+			taskList.Tasks[i] = newTask
+		}
+	}
+	if !taskFound {
+		return errors.New("invalid taskId")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	collection := md.Client.Database("todosDB").Collection("todos")
+	err = collection.FindOneAndUpdate(ctx, bson.D{{"id", listId}}, bson.D{{"$set", bson.D{{"tasks", taskList.Tasks}}}}).Err()
+	if err != nil {
+		return err
+	}
+	return nil
+}

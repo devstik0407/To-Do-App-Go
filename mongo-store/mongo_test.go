@@ -186,3 +186,29 @@ func TestGetTaskFail(t *testing.T) {
 		t.Errorf("actual error: %v\nexpected error: %v", err, errors.New("invalid taskId"))
 	}
 }
+
+func TestUpdateTaskSuccess(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	md := Connect(ctx)
+	err := md.UpdateTask(1, todos.Task{Id: 1, Desc: "read books"})
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestUpdateTaskFail(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	md := Connect(ctx)
+
+	err := md.UpdateTask(1, todos.Task{Id: 100, Desc: "read books"})
+	if err == nil {
+		t.Errorf("actual error: none\nexpected error: %v", errors.New("invalid taskId"))
+	}
+	if err.Error() != "invalid taskId" {
+		t.Errorf("actual error: %v\nexpected error: %v", err, errors.New("invalid taskId"))
+	}
+}
