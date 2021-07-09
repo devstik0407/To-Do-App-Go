@@ -62,10 +62,19 @@ go run main.go
 For more details, please check the `swagger.yaml` file
 
 # Testing Guide
-- cd into the `handlers` directory and run
+- To test the handlers, cd into the `handlers` directory and run
 ```
 go test
 ```
-
+- To test todos, cd into the `todos` directory and run
+```
+go test
+```
+- To test mongo-store
+    <ol>
+    <li>Set up a mongoDB server with an empty or no <code>todosDB</code></li>
+    <li>cd into the <code>mongo-store</code> directory
+    <li>Run the command <code>go test</code></li>
+    </ol>
 # Contributors
 - Swastik Dutta - https://github.com/devstik0407
