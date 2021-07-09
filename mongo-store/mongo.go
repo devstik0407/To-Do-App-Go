@@ -61,3 +61,18 @@ func (md MongoDB) GetTaskList(listId int64) (todos.TaskList, error) {
 	}
 	return res, nil
 }
+
+func (md MongoDB) DeleteTaskList(listId int64) error {
+	collection := md.Client.Database("todosDB").Collection("todos")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	res, err := collection.DeleteOne(ctx, bson.D{{"id", listId}})
+	if err != nil {
+		return err
+	}
+	if res.DeletedCount == 0 {
+		return errors.New("invalid listId")
+	}
+	return nil
+}

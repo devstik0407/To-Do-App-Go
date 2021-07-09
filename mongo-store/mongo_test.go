@@ -56,3 +56,28 @@ func TestGetTaskListFail(t *testing.T) {
 		t.Errorf("actual error: %v\nexpected error: %v", err, errors.New("invalid listId"))
 	}
 }
+
+func TestDeleteTaskListSuccess(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	md := Connect(ctx)
+	err := md.DeleteTaskList(1)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestDeleteTaskListFail(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	md := Connect(ctx)
+	err := md.DeleteTaskList(1)
+	if err == nil {
+		t.Errorf("actual error: none\nexpected error: %v", errors.New("invalid listId"))
+	}
+	if err.Error() != "invalid listId" {
+		t.Errorf("actual error: %v\nexpected error: %v", err, errors.New("invalid listId"))
+	}
+}
